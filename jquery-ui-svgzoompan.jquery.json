@@ -1,0 +1,28 @@
+{
+  "name": "jquery-ui-svgzoompan",
+  "title": "SVG Zoom&Pan jQueryUI plugin",
+  "description": "The best jQuery plugin ever.",
+  "version": "0.0.1",
+  "homepage": "https://github.com/croogie/jquery-ui-svgzoompan.git",
+  "author": {
+    "name": "Michał Świtoń",
+    "url": "https://github.com/croogie"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/croogie/jquery-ui-svgzoompan.git"
+  },
+  "bugs": "https://github.com/croogie/jquery-ui-svgzoompan/issues",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    }
+  ],
+  "dependencies": {
+    "jquery": "~2.1.1"
+  },
+  "keywords": [
+    "jquery-plugin"
+  ]
+}
