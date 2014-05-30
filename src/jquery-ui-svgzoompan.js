@@ -164,44 +164,62 @@
             this._registerEvents();
         },
 
-        zoom: function (direction) {
-            direction = direction.toLowerCase();
+      zoom: function (direction) {
+        direction = direction.toLowerCase();
+        var curViewBox = this._getViewBox();
 
-            if (direction === 'in' && this.curZoomIndex === (this.zoomLevels.length - 1)) {
-                return false;
-            } else if (direction === 'out' && this.curZoomIndex === 0) {
-                return false;
-            } else { // OK to zoom!
-                if (direction === 'in') {
-                    this.curZoomIndex++;
-                } else {
-                    this.curZoomIndex--;
-                }
+        this._trigger('beforezoom', null, {
+          zoomLevel: this.zoomLevels[this.curZoomIndex],
+          x: parseFloat(curViewBox[0]),
+          y: parseFloat(curViewBox[1]),
+          width: parseFloat(curViewBox[2]),
+          height: parseFloat(curViewBox[3]),
+          direction: direction
+        });
 
-                var curViewBox = this._getViewBox();
-                var nextViewBoxDims = this.viewBoxDims[this.curZoomIndex];
+        if (direction === 'in' && this.curZoomIndex === (this.zoomLevels.length - 1)) {
+          return false;
+        } else if (direction === 'out' && this.curZoomIndex === 0) {
+          return false;
+        } else { // OK to zoom!
+          if (direction === 'in') {
+            this.curZoomIndex++;
+          } else {
+            this.curZoomIndex--;
+          }
 
-                var minx = parseFloat(curViewBox[0]) + parseFloat((parseFloat(curViewBox[2]) - parseFloat(nextViewBoxDims.width)) / 2);
-                if (minx < 0) { // Too far left!
-                    minx = 0;
-                } else if ((minx + parseFloat(nextViewBoxDims.width)) > parseFloat(this.masterViewBox[2])) { // Too far right!
-                    minx = parseFloat(this.masterViewBox[2]) - parseFloat(nextViewBoxDims.width);
-                }
+          var nextViewBoxDims = this.viewBoxDims[this.curZoomIndex];
 
-                var miny = parseFloat(curViewBox[1]) + parseFloat((parseFloat(curViewBox[3]) - parseFloat(nextViewBoxDims.height)) / 2);
-                if (miny < 0) { // Too far up!
-                    miny = 0;
-                } else if ((miny + parseFloat(nextViewBoxDims.height)) > parseFloat(this.masterViewBox[3])) { // Too far down!
-                    miny = parseFloat(this.masterViewBox[3]) - parseFloat(nextViewBoxDims.height);
-                }
+          var minx = parseFloat(curViewBox[0]) + parseFloat((parseFloat(curViewBox[2]) - parseFloat(nextViewBoxDims.width)) / 2);
+          if (minx < 0) { // Too far left!
+            minx = 0;
+          } else if ((minx + parseFloat(nextViewBoxDims.width)) > parseFloat(this.masterViewBox[2])) { // Too far right!
+            minx = parseFloat(this.masterViewBox[2]) - parseFloat(nextViewBoxDims.width);
+          }
 
-                this.element.get(0).setAttribute(
-                    "viewBox",
-                    minx + " " + miny + " " + nextViewBoxDims.width + " " + nextViewBoxDims.height
-                );
-            }
+          var miny = parseFloat(curViewBox[1]) + parseFloat((parseFloat(curViewBox[3]) - parseFloat(nextViewBoxDims.height)) / 2);
+          if (miny < 0) { // Too far up!
+            miny = 0;
+          } else if ((miny + parseFloat(nextViewBoxDims.height)) > parseFloat(this.masterViewBox[3])) { // Too far down!
+            miny = parseFloat(this.masterViewBox[3]) - parseFloat(nextViewBoxDims.height);
+          }
 
-            return this;
+          this.element.get(0).setAttribute(
+            "viewBox",
+            minx + " " + miny + " " + nextViewBoxDims.width + " " + nextViewBoxDims.height
+          );
+
+          this._trigger('afterzoom', null, {
+            zoomLevel: this.zoomLevels[this.curZoomIndex],
+            x: minx,
+            y: miny,
+            width: nextViewBoxDims.width,
+            height: nextViewBoxDims.height,
+            direction: direction
+          });
         }
+
+        return this;
+      }
     });
 }(jQuery));
