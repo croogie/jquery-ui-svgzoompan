@@ -1,4 +1,4 @@
-/*! jquery-ui-svgzoompan - v0.0.2 - 2014-05-30
+/*! jquery-ui-svgzoompan - v0.0.3 - 2014-05-30
 * https://github.com/croogie/jquery-ui-svgzoompan
 * Copyright (c) 2014 Michał Świtoń; Licensed MIT */
 (function ($, undefined) {
