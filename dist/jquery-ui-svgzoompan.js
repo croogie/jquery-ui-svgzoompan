@@ -1,4 +1,4 @@
-/*! jquery-ui-svgzoompan - v0.0.3 - 2014-05-30
+/*! jquery-ui-svgzoompan - v0.0.4 - 2014-06-02
 * https://github.com/croogie/jquery-ui-svgzoompan
 * Copyright (c) 2014 Michał Świtoń; Licensed MIT */
 (function ($, undefined) {
@@ -10,6 +10,7 @@
     mouseTouchEvent: false,
     startX: null,
     startY: null,
+    flag: 0,
 
     options: {
       zoomLevels: "200, 300, 400, 500, 600, 700, 800, 900, 1000",
@@ -61,8 +62,8 @@
       });
     },
 
-    _handleWheelEvent: function (e) {
-      if (e.originalEvent.wheelDelta / 120 > 0) {
+    _handleWheelEvent: function (e, delta) {
+      if (delta > 0) {
         this.zoom('in');
       } else {
         this.zoom('out');
@@ -70,10 +71,10 @@
     },
 
     _handleMouseDownEvent: function (e) {
-      this.element.data('p0', { x: e.pageX, y: e.pageY });
-      this.mouseTouchEvent = true;
+      this.flag = 1;
 
-      this._trigger('dragstart');
+      e.stopPropagation();
+      e.preventDefault();
 
       if (!e.touches) {
         this.startX = e.clientX;
@@ -85,22 +86,25 @@
     },
 
     _handleMouseUpEvent: function (e) {
-      var p0 = this.element.data('p0'),
-        p1 = { x: e.pageX, y: e.pageY },
-        delta = Math.sqrt(Math.pow(p1.x - p0.x, 2) + Math.pow(p1.y - p0.y, 2));
-
-      this.mouseTouchEvent = false;
-
-      if (delta > 3) { // mouse has been moved
+      if (this.flag === 2) {
         e.preventDefault();
         e.stopPropagation();
 
         this._trigger('dragend');
+      } else {
+        this._trigger('click');
       }
+
+      this.flag = 0;
     },
 
     _handleDragEvent: function (e) {
-      if (this.mouseTouchEvent) {
+      if (this.flag === 1) {
+        this._trigger('dragstart');
+        this.flag = 2;
+      }
+
+      if (this.flag === 2) {
         e.preventDefault();
         e.stopPropagation();
 
