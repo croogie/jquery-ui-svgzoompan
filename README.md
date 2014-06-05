@@ -28,4 +28,7 @@ _(Coming soon)_
 _(Coming soon)_
 
 ## Release History
-_(Nothing yet)_
+###v0.0.5
+* introduced new public method `refresh` when you play with viewBox by yourself and want to set correct zoom level,
+* now `viewBox` is passed to `drag` event,
+
