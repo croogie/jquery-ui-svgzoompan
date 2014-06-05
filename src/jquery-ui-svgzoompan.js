@@ -23,6 +23,18 @@
       initialMinY: false
     },
 
+    _registerEvents: function () {
+      this._on(this.element, {
+        'mousewheel': '_handleWheelEvent',
+        'mousedown': '_handleMouseDownEvent',
+        'touchstart': '_handleMouseDownEvent',
+        'mouseup': '_handleMouseUpEvent',
+        'touchend': '_handleMouseUpEvent',
+        'mousemove': '_handleDragEvent',
+        'touchmove': '_handleDragEvent'
+      });
+    },
+
     _setZoomLevels: function () {
       this.zoomLevels = this.options.zoomLevels.split(', ');
       this.zoomLevels.push(this.options.initialZoom);
@@ -52,18 +64,6 @@
           this.element.attr('viewBox', minx + " " + miny + " " + viewBoxWidth + " " + viewBoxHeight);
         }
       }
-    },
-
-    _registerEvents: function () {
-      this._on(this.element, {
-        'mousewheel': '_handleWheelEvent',
-        'mousedown': '_handleMouseDownEvent',
-        'touchstart': '_handleMouseDownEvent',
-        'mouseup': '_handleMouseUpEvent',
-        'touchend': '_handleMouseUpEvent',
-        'mousemove': '_handleDragEvent',
-        'touchmove': '_handleDragEvent'
-      });
     },
 
     _handleWheelEvent: function (e, delta) {
@@ -153,12 +153,11 @@
           newMinY = 0;
         }
 
-        this.element.get(0).setAttribute(
-          'viewBox',
-          newMinX + " " + newMinY + " " + curViewBox[2] + " " + curViewBox[3]
-        );
+        var viewBox = newMinX + " " + newMinY + " " + curViewBox[2] + " " + curViewBox[3];
 
-        this._trigger('drag');
+        this.element.get(0).setAttribute('viewBox', viewBox);
+
+        this._trigger('drag', null, { viewBox: viewBox });
 
         if (!e.touches) {
           this.startX = e.clientX;
@@ -179,6 +178,48 @@
 
       this._setZoomLevels();
       this._registerEvents();
+    },
+
+    refresh: function () {
+      var curViewBox = this._getViewBox(),
+        width = parseFloat(curViewBox[2]),
+        height = parseFloat(curViewBox[3]),
+        newZoomIndex;
+
+      for (var i in this.viewBoxDims) {
+        var viewBoxDim = this.viewBoxDims[i];
+        if (width > viewBoxDim.width && height > viewBoxDim.height) {
+          newZoomIndex = i - 1;
+          break;
+        }
+      }
+
+      // set to last zoom level if it is too small
+      if (newZoomIndex === undefined) {
+        newZoomIndex = this.viewBoxDims.length - 1;
+      } else if (newZoomIndex < 0) {
+        newZoomIndex = 0;
+      }
+
+      if (newZoomIndex === this.curZoomIndex) {
+        return this;
+      }
+
+      var direction = newZoomIndex > this.curZoomIndex ? 'in' : 'out';
+
+      this.curZoomIndex = newZoomIndex;
+
+      var eventData = {
+        zoomLevel: this.zoomLevels[this.curZoomIndex],
+        x: curViewBox[0],
+        y: curViewBox[1],
+        width: width,
+        height: height,
+        direction: direction
+      };
+
+      this._trigger('beforezoom', null, eventData);
+      this._trigger('afterzoom', null, eventData);
     },
 
     zoom: function (direction) {
