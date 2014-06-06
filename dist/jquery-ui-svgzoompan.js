@@ -1,4 +1,4 @@
-/*! jquery-ui-svgzoompan - v0.0.5 - 2014-06-05
+/*! jquery-ui-svgzoompan - v0.0.6 - 2014-06-06
 * https://github.com/croogie/jquery-ui-svgzoompan
 * Copyright (c) 2014 Michał Świtoń; Licensed MIT */
 (function ($, undefined) {
@@ -216,6 +216,11 @@
 
       this._trigger('beforezoom', null, eventData);
       this._trigger('afterzoom', null, eventData);
+    },
+
+    reset: function () {
+      this.curZoomIndex = 1;
+      this.zoom('out');
     },
 
     zoom: function (direction) {
