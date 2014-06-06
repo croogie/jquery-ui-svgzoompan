@@ -222,6 +222,11 @@
       this._trigger('afterzoom', null, eventData);
     },
 
+    reset: function () {
+      this.curZoomIndex = 1;
+      this.zoom('out');
+    },
+
     zoom: function (direction) {
       direction = direction.toLowerCase();
       var curViewBox = this._getViewBox();
